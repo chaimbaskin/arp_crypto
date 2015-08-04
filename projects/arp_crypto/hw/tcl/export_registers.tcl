@@ -44,7 +44,7 @@ set DEF_LIST {
 	{NF_10G_INTERFACE2 2 1 nf_10g_interface_v1_0_0/data/nf_10g_interface_regs_defines.txt} \
 	{NF_10G_INTERFACE3 3 1 nf_10g_interface_v1_0_0/data/nf_10g_interface_regs_defines.txt} \
 	{NF_RIFFA_DMA 0 1 nf_riffa_dma_v1_0_0/data/nf_riffa_dma_regs_defines.txt} \
-	{ARP_CRYPTO 0 1 ../../../../projects/arp_crypto/hw/local_ip/crypto_v1_0_0/data/arp_crypto_regs_defines.txt} \
+	{ARP_CRYPTO 0 1 ../../../../projects/arp_crypto/hw/local_ip/arp_crypto_v1_0_0/data/arp_crypto_regs_defines.txt} \
 
 
 }
