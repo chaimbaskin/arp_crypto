@@ -144,16 +144,17 @@ module arp_crypto
    endfunction // log2
 
    // ---------- Local Parameters ---------
-   localparam IDLE              = 1;
-   localparam ARP_1             = 2;
-   localparam DATA_TX           = 4;
-   localparam HEADER_TRANS      = 8;
-   localparam NOT_ARP           = 16; 
+   localparam IDLE              = 5'b00001;
+   localparam ARP_1             = 5'b00010;
+   localparam DATA_TX           = 5'b00100;
+   localparam HEADER_TRANS      = 5'b01000;
+   localparam NOT_ARP           = 5'b10000; 
 
    localparam MAGIC             = 32'hA5A5A5A5;
 
    localparam TYPE_HIGH         = (6+6)*8 + 2*8 -1  ; //src + dest + type 
    localparam TYPE_LOW          = (6+6)*8   ; //src + dest + type    
+   localparam ARP_TYPE          = 16'h608;  
 
    // ------------- Regs/ wires -----------
 
@@ -167,8 +168,8 @@ module arp_crypto
    wire                             fifo_tvalid;
    wire                             fifo_tlast;
 
-   reg  [2:0]                       state, next_state;
-   wire [32:0]                      reg_0,reg_1,reg_2,reg_3;       //for presentation. will be replaced
+   reg  [4:0]                       state, next_state;
+   wire [31:0]                      reg_0,reg_1,reg_2,reg_3;       //for presentation. will be replaced
 
    assign reg_0 = ip2cpu_data0_reg;
    assign reg_1 = ip2cpu_data1_reg;
@@ -219,8 +220,7 @@ module arp_crypto
             m_axis_tvalid = !fifo_empty;         
             if (m_axis_tvalid && m_axis_tready) begin                                   
                 fifo_rd_en = 1;                                                         
-                //if fifo_out_tdata[TYPE_HIGH : TYPE_LOW] == 16'h0608        //ARP TYPE 
-		if fifo_out_tdata[255 : 255-16] == 16'h0608        //ARP TYPE     
+                if (fifo_out_tdata[TYPE_HIGH : TYPE_LOW] == 16'h0608)        //ARP TYPE 
                     next_state = ARP_1;
                 else
                     next_state = NOT_ARP;
@@ -343,7 +343,7 @@ arp_crypto_cpu_regs
    assign reset_registers = reset_reg[4];
 
    wire [31:0] reg_key_default_little;
-   assign reg_key_default_little = `REG_KEY_DEFAULT;
+   assign reg_key_default_little = `REG_DATA0_DEFAULT;
 ////registers logic, current logic is just a placeholder for initial compil, required to be changed by the user
 always @(posedge axis_aclk)
 	if (~resetn_sync | reset_registers) begin
