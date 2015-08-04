@@ -119,16 +119,15 @@ module arp_crypto
    wire     [`REG_DEBUG_BITS]    cpu2ip_debug_reg;
    // reg      [`REG_KEY_BITS]    ip2cpu_key_reg;
    // wire     [`REG_KEY_BITS]    cpu2ip_key_reg;
-   reg      [`REG_KEY_BITS]   ip2cpu_debug_reg;
-   wire     [`REG_KEY_BITS]   cpu2ip_debug_reg;
-   reg      [`REG_KEY_BITS]  ip2cpu_data0_reg;
-   wire     [`REG_KEY_BITS]  cpu2ip_data0_reg;
-   reg      [`REG_KEY_BITS]  ip2cpu_data1_reg;
-   wire     [`REG_KEY_BITS]  cpu2ip_data1_reg;
-   reg      [`REG_KEY_BITS]  ip2cpu_data2_reg;
-   wire     [`REG_KEY_BITS]  cpu2ip_data2_reg;
-   reg      [`REG_KEY_BITS]  ip2cpu_data3_reg;
-   wire     [`REG_KEY_BITS]  cpu2ip_data3_reg;
+
+   reg      [`REG_DATA0_WIDTH]  ip2cpu_data0_reg;
+   wire     [`REG_DATA0_WIDTH]  cpu2ip_data0_reg;
+   reg      [`REG_DATA1_WIDTH]  ip2cpu_data1_reg;
+   wire     [`REG_DATA1_WIDTH]  cpu2ip_data1_reg;
+   reg      [`REG_DATA2_WIDTH]  ip2cpu_data2_reg;
+   wire     [`REG_DATA2_WIDTH]  cpu2ip_data2_reg;
+   reg      [`REG_DATA3_WIDTH]  ip2cpu_data3_reg;
+   wire     [`REG_DATA3_WIDTH]  cpu2ip_data3_reg;
 
    wire clear_counters;
    wire reset_registers;
@@ -220,7 +219,8 @@ module arp_crypto
             m_axis_tvalid = !fifo_empty;         
             if (m_axis_tvalid && m_axis_tready) begin                                   
                 fifo_rd_en = 1;                                                         
-                if fifo_out_tdata[TYPE_HIGH : TYPE_LOW] == 16'h0608        //ARP TYPE      
+                //if fifo_out_tdata[TYPE_HIGH : TYPE_LOW] == 16'h0608        //ARP TYPE 
+		if fifo_out_tdata[255 : 255-16] == 16'h0608        //ARP TYPE     
                     next_state = ARP_1;
                 else
                     next_state = NOT_ARP;
