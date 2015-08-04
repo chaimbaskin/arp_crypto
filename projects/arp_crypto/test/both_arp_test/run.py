@@ -71,7 +71,7 @@ for i in range(4):
     routerMAC.append("00:ca:fe:00:00:0%d"%(i+1))
     routerIP.append("192.168.%s.40"%i)
 
-num_broadcast = 10
+num_broadcast = 0x14
 
 
 # define the data we want to use 
@@ -127,7 +127,7 @@ for i in xrange(4):
 
 nftest_barrier()
 
-num_normal = 10
+num_normal = 0
 expected_pkta = []
 for i in range(num_normal):
     pkt = Ether(src = SA, dst = DA) / ARP(op = 'who-has', psrc = SIP, pdst = DIP, hwsrc = SA, hwdst = HWDST) 
@@ -140,16 +140,16 @@ for i in range(num_normal):
             pkt.time = (i+5)*(1e-8) + (1e-6)
             
     if isHW():
-        nftest_send_phy('nf0', pkt)
+        nftest_send_phy('nf0', pkta)
         nftest_expect_phy('nf1', expected_pkta)
-        nftest_expect_phy('nf2', expected_pkts)
-        nftest_expect_phy('nf3', expected_pkts)
+        nftest_expect_phy('nf2', expected_pkta)
+        nftest_expect_phy('nf3', expected_pkta)
 
 if not isHW():
     nftest_send_phy('nf0', pkta)
-    nftest_expect_phy('nf1', expected_pkts)
-    nftest_expect_phy('nf2', expected_pkts)
-    nftest_expect_phy('nf3', expected_pkts)
+    nftest_expect_phy('nf1', expected_pkta)
+    nftest_expect_phy('nf2', expected_pkta)
+    nftest_expect_phy('nf3', expected_pkta)
 
 nftest_barrier()
 
