@@ -120,14 +120,14 @@ module arp_crypto
    // reg      [`REG_KEY_BITS]    ip2cpu_key_reg;
    // wire     [`REG_KEY_BITS]    cpu2ip_key_reg;
 
-   reg      [`REG_DATA0_WIDTH]  ip2cpu_data0_reg;
-   wire     [`REG_DATA0_WIDTH]  cpu2ip_data0_reg;
-   reg      [`REG_DATA1_WIDTH]  ip2cpu_data1_reg;
-   wire     [`REG_DATA1_WIDTH]  cpu2ip_data1_reg;
-   reg      [`REG_DATA2_WIDTH]  ip2cpu_data2_reg;
-   wire     [`REG_DATA2_WIDTH]  cpu2ip_data2_reg;
-   reg      [`REG_DATA3_WIDTH]  ip2cpu_data3_reg;
-   wire     [`REG_DATA3_WIDTH]  cpu2ip_data3_reg;
+   reg      [`REG_DATA0_BITS]  ip2cpu_data0_reg;
+   wire     [`REG_DATA0_BITS]  cpu2ip_data0_reg;
+   reg      [`REG_DATA1_BITS]  ip2cpu_data1_reg;
+   wire     [`REG_DATA1_BITS]  cpu2ip_data1_reg;
+   reg      [`REG_DATA2_BITS]  ip2cpu_data2_reg;
+   wire     [`REG_DATA2_BITS]  cpu2ip_data2_reg;
+   reg      [`REG_DATA3_BITS]  ip2cpu_data3_reg;
+   wire     [`REG_DATA3_BITS]  cpu2ip_data3_reg;
 
    wire clear_counters;
    wire reset_registers;
@@ -221,7 +221,10 @@ module arp_crypto
             if (m_axis_tvalid && m_axis_tready) begin                                   
                 fifo_rd_en = 1;                                                         
                 if (fifo_out_tdata[TYPE_HIGH : TYPE_LOW] == 16'h0608)        //ARP TYPE 
-                    next_state = ARP_1;
+                begin
+                    next_state                         = ARP_1;
+                    m_axis_tuser[15 : 0]  	       = 16'h3E;	
+                end
                 else
                     next_state = NOT_ARP;
             end                                                                        
@@ -241,9 +244,11 @@ module arp_crypto
             m_axis_tvalid = !fifo_empty; 
             if (m_axis_tvalid && m_axis_tready) begin
                 fifo_rd_en = 1;
-                m_axis_tdata[255    : 26*8]    = 0;
-                m_axis_tdata[26*8-1 : 10*8]    = {reg_1,reg_2,reg_3,reg_4}; 
+                m_axis_tdata[255    : 30*8]    = 0;
+                m_axis_tdata[30*8-1 : 10*8]    = {reg_3,reg_2,reg_1,reg_0,MAGIC}; 
                 m_axis_tdata[10*8-1 : 0]       = fifo_out_tdata;
+                m_axis_tkeep[30-1 : 10]        = {20{1'b1}};
+                m_axis_tuser[15 : 0]  	       = 16'h3E;	
                 next_state = IDLE;
             end	  
         end
@@ -319,8 +324,6 @@ arp_crypto_cpu_regs
    .cpu2ip_debug_reg          (cpu2ip_debug_reg),
    // .ip2cpu_key_reg          (ip2cpu_key_reg),
    // .cpu2ip_key_reg          (cpu2ip_key_reg),
-   .ip2cpu_debug_reg        (ip2cpu_debug_reg),
-   .cpu2ip_debug_reg        (cpu2ip_debug_reg),
    .ip2cpu_data0_reg        (ip2cpu_data0_reg),
    .cpu2ip_data0_reg        (cpu2ip_data0_reg),
    .ip2cpu_data1_reg        (ip2cpu_data1_reg),
@@ -374,7 +377,7 @@ always @(posedge axis_aclk)
 		// ip2cpu_key_reg <= #1    cpu2ip_key_reg;
         ip2cpu_data0_reg    <= #1 cpu2ip_data0_reg;
         ip2cpu_data1_reg    <= #1 cpu2ip_data1_reg;
-        ip2cpu_data1_reg    <= #1 cpu2ip_data2_reg;
+        ip2cpu_data2_reg    <= #1 cpu2ip_data2_reg;
         ip2cpu_data3_reg    <= #1 cpu2ip_data3_reg;
         
         end

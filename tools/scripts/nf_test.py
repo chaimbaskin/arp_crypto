@@ -453,6 +453,7 @@ def identifyTests():
 	number = args.packet_no
 
     dirs = os.listdir(os.environ['NF_DESIGN_DIR'] + '/test')
+    print dirs
     global tests;tests = []
     for test in dirs:
         if test.startswith(test_name) or test.startswith(both_test_name):

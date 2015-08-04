@@ -35,9 +35,9 @@ logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from NFTest import *
 import sys
 import os
-from scapy.layers.all import Ether, IP, TCP
-from reg_defines_crypto_switch import *
-from crypto_lib import *
+from scapy.layers.all import Ether, ARP, Raw
+from reg_defines_arp_crypto import *
+#from crypto_lib import *
 from struct import pack, unpack
 
 #conn = ('../connections/crossover', [])
@@ -76,11 +76,11 @@ num_broadcast = 10
 
 # define the data we want to use 
 key = ''.join([chr(i) for i in xrange(16)])
-key1 = ''.join([chr(i) for i in xrange(255-16, 255)])
+key1 = ''.join([chr(i) for i in xrange(255-15, 256)])
 data = unpack(">LLLL", key)
 data1 = unpack(">LLLL", key1)
 addrs = [SUME_ARP_CRYPTO_0_DATA0, SUME_ARP_CRYPTO_0_DATA1, SUME_ARP_CRYPTO_0_DATA2, SUME_ARP_CRYPTO_0_DATA3]
-magic = 0xa5a5a5a5
+magic = pack('<L', 0xa5a5a5a5)
 
 for i in xrange(4):
     nftest_regwrite(addrs[i](), data[i])
@@ -89,30 +89,31 @@ for i in xrange(4):
     else:
         nftest_regread_expect(addrs[i](), data[i]) 
 
-# maybe add a barrier here
-#nftest_barrier()
+nftest_barrier()
 
 pkts = []
+expected_pkts = []
 pkta = []
 for i in range(num_broadcast):
-    pkt = Ether(src = SA, dst = DA) / ARP(op = 'who-has', psrc = SIP, pdst = DIP, hwsrc = SA, hwdst = HWDST) / Raw(load = magic + data)
+    pkt = Ether(src = SA, dst = DA) / ARP(op = 'who-has', psrc = SIP, pdst = DIP, hwsrc = SA, hwdst = HWDST)
 
     pkt.tuser_sport = 1
     pkts.append(pkt)
+    expected_pkts.append(pkt / Raw(load = magic + key))
 
     for i in range(num_broadcast):
         for pkt in pkts:
             pkt.time = i*(1e-8) + (1e-6)
 
     if isHW():
-        nftest_expect_phy('nf1', pkt)
+        nftest_expect_phy('nf1', pkt / Raw(load = magic + key))
         nftest_send_phy('nf0', pkt)
     
 if not isHW():
     nftest_send_phy('nf0', pkts)
-    nftest_expect_phy('nf1', pkts)
-    nftest_expect_phy('nf2', pkts)
-    nftest_expect_phy('nf3', pkts)
+    nftest_expect_phy('nf1', expected_pkts)
+    nftest_expect_phy('nf2', expected_pkts)
+    nftest_expect_phy('nf3', expected_pkts)
 
 nftest_barrier()
 
@@ -124,26 +125,31 @@ for i in xrange(4):
     else:
         nftest_regread_expect(addrs[i](), data1[i]) 
 
-#nftest_barrier()
+nftest_barrier()
 
 num_normal = 10
-
+expected_pkta = []
 for i in range(num_normal):
-    pkt = Ether(src = SA, dst = DA) / ARP(op = 'who-has', psrc = SIP, pdst = DIP, hwsrc = SA, hwdst = HWDST) / Raw(load = magic + data)
+    pkt = Ether(src = SA, dst = DA) / ARP(op = 'who-has', psrc = SIP, pdst = DIP, hwsrc = SA, hwdst = HWDST) 
     pkt.tuser_sport = 1
     pkta.append(pkt)
+    expected_pkta.append(pkt / Raw(load = magic + key1))
 
     for i in range(num_normal):
         for pkt in pkta:
             pkt.time = (i+5)*(1e-8) + (1e-6)
             
     if isHW():
-        nftest_send_phy('nf1', pkt)
-        nftest_expect_phy('nf0', pkt)
+        nftest_send_phy('nf0', pkt)
+        nftest_expect_phy('nf1', expected_pkta)
+        nftest_expect_phy('nf2', expected_pkts)
+        nftest_expect_phy('nf3', expected_pkts)
 
 if not isHW():
-    nftest_send_phy('nf1', pkta)
-    nftest_expect_phy('nf0', pkta)
+    nftest_send_phy('nf0', pkta)
+    nftest_expect_phy('nf1', expected_pkts)
+    nftest_expect_phy('nf2', expected_pkts)
+    nftest_expect_phy('nf3', expected_pkts)
 
 nftest_barrier()
 
