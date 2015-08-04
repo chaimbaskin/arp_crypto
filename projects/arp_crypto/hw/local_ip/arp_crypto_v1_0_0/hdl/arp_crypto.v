@@ -117,8 +117,18 @@ module arp_crypto
    wire                             pktout_reg_clear;
    reg      [`REG_DEBUG_BITS]    ip2cpu_debug_reg;
    wire     [`REG_DEBUG_BITS]    cpu2ip_debug_reg;
-   reg      [`REG_KEY_BITS]    ip2cpu_key_reg;
-   wire     [`REG_KEY_BITS]    cpu2ip_key_reg;
+   // reg      [`REG_KEY_BITS]    ip2cpu_key_reg;
+   // wire     [`REG_KEY_BITS]    cpu2ip_key_reg;
+   reg      [`REG_KEY_BITS]   ip2cpu_debug_reg;
+   wire     [`REG_KEY_BITS]   cpu2ip_debug_reg;
+   reg      [`REG_KEY_BITS]  ip2cpu_data0_reg;
+   wire     [`REG_KEY_BITS]  cpu2ip_data0_reg;
+   reg      [`REG_KEY_BITS]  ip2cpu_data1_reg;
+   wire     [`REG_KEY_BITS]  cpu2ip_data1_reg;
+   reg      [`REG_KEY_BITS]  ip2cpu_data2_reg;
+   wire     [`REG_KEY_BITS]  cpu2ip_data2_reg;
+   reg      [`REG_KEY_BITS]  ip2cpu_data3_reg;
+   wire     [`REG_KEY_BITS]  cpu2ip_data3_reg;
 
    wire clear_counters;
    wire reset_registers;
@@ -161,10 +171,10 @@ module arp_crypto
    reg  [2:0]                       state, next_state;
    wire [32:0]                      reg_0,reg_1,reg_2,reg_3;       //for presentation. will be replaced
 
-   assign reg_0 = TBD;
-   assign reg_1 = TBD;
-   assign reg_2 = TBD;
-   assign reg_3 = TBD;
+   assign reg_0 = ip2cpu_data0_reg;
+   assign reg_1 = ip2cpu_data1_reg;
+   assign reg_2 = ip2cpu_data2_reg;
+   assign reg_3 = ip2cpu_data3_reg;
 
 
    // ------------ Modules -------------
@@ -232,7 +242,7 @@ module arp_crypto
             if (m_axis_tvalid && m_axis_tready) begin
                 fifo_rd_en = 1;
                 m_axis_tdata[255    : 26*8]    = 0;
-                m_axis_tdata[26*8-1 : 10*8]    = {MAGIC,reg_2,reg_3,reg_4}; 
+                m_axis_tdata[26*8-1 : 10*8]    = {reg_1,reg_2,reg_3,reg_4}; 
                 m_axis_tdata[10*8-1 : 0]       = fifo_out_tdata;
                 next_state = IDLE;
             end	  
@@ -307,8 +317,22 @@ arp_crypto_cpu_regs
    .pktout_reg_clear    (pktout_reg_clear),
    .ip2cpu_debug_reg          (ip2cpu_debug_reg),
    .cpu2ip_debug_reg          (cpu2ip_debug_reg),
-   .ip2cpu_key_reg          (ip2cpu_key_reg),
-   .cpu2ip_key_reg          (cpu2ip_key_reg),
+   // .ip2cpu_key_reg          (ip2cpu_key_reg),
+   // .cpu2ip_key_reg          (cpu2ip_key_reg),
+   .ip2cpu_debug_reg        (ip2cpu_debug_reg),
+   .cpu2ip_debug_reg        (cpu2ip_debug_reg),
+   .ip2cpu_data0_reg        (ip2cpu_data0_reg),
+   .cpu2ip_data0_reg        (cpu2ip_data0_reg),
+   .ip2cpu_data1_reg        (ip2cpu_data1_reg),
+   .cpu2ip_data1_reg        (cpu2ip_data1_reg),
+   .ip2cpu_data2_reg        (ip2cpu_data2_reg),
+   .cpu2ip_data2_reg        (cpu2ip_data2_reg),
+   .ip2cpu_data3_reg        (ip2cpu_data3_reg),
+   .cpu2ip_data3_reg        (cpu2ip_data3_reg),
+   
+   
+   
+   
    // Global Registers - user can select if to use
    .cpu_resetn_soft(),//software reset, after cpu module
    .resetn_soft    (),//software reset to cpu module (from central reset management)
@@ -329,8 +353,12 @@ always @(posedge axis_aclk)
 		pktin_reg <= #1    `REG_PKTIN_DEFAULT;
 		pktout_reg <= #1    `REG_PKTOUT_DEFAULT;
 		ip2cpu_debug_reg <= #1    `REG_DEBUG_DEFAULT;
-                ip2cpu_key_reg <= #1 {reg_key_default_little[7:0],reg_key_default_little[15:8],reg_key_default_little[23:16],reg_key_default_little[31:24]};
-	end
+                // ip2cpu_key_reg <= #1 {reg_key_default_little[7:0],reg_key_default_little[15:8],reg_key_default_little[23:16],reg_key_default_little[31:24]};
+                ip2cpu_data0_reg <= #1 {reg_key_default_little[7:0],reg_key_default_little[15:8],reg_key_default_little[23:16],reg_key_default_little[31:24]};
+                ip2cpu_data1_reg  <= #1 {reg_key_default_little[7:0],reg_key_default_little[15:8],reg_key_default_little[23:16],reg_key_default_little[31:24]};
+                ip2cpu_data2_reg  <= #1 {reg_key_default_little[7:0],reg_key_default_little[15:8],reg_key_default_little[23:16],reg_key_default_little[31:24]};
+                ip2cpu_data3_reg  <= #1 {reg_key_default_little[7:0],reg_key_default_little[15:8],reg_key_default_little[23:16],reg_key_default_little[31:24]};
+    end
 	else begin
 		id_reg <= #1    `REG_ID_DEFAULT;
 		version_reg <= #1    `REG_VERSION_DEFAULT;
@@ -343,7 +371,12 @@ always @(posedge axis_aclk)
                 pktout_reg [`REG_PKTOUT_WIDTH-1]<= #1  clear_counters | pktout_reg_clear ? 'h0  : pktout_reg [`REG_PKTOUT_WIDTH-2:0] + + (m_axis_tlast && m_axis_tvalid && m_axis_tready)  > {(`REG_PKTOUT_WIDTH-1){1'b1}} ?
                                                                 1'b1 : pktout_reg [`REG_PKTOUT_WIDTH-1];
 		ip2cpu_debug_reg <= #1    `REG_DEBUG_DEFAULT+cpu2ip_debug_reg;
-		ip2cpu_key_reg <= #1    cpu2ip_key_reg;
+		// ip2cpu_key_reg <= #1    cpu2ip_key_reg;
+        ip2cpu_data0_reg    <= #1 cpu2ip_data0_reg;
+        ip2cpu_data1_reg    <= #1 cpu2ip_data1_reg;
+        ip2cpu_data1_reg    <= #1 cpu2ip_data2_reg;
+        ip2cpu_data3_reg    <= #1 cpu2ip_data3_reg;
+        
         end
 
 
