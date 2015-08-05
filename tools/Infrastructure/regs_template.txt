@@ -215,7 +215,7 @@ def write_hFile_header(hFile):
 # a function that writes the header of regs table file
 ##################################################################
 def write_tbFile_header(tbFile):
-      hFile.write('\
+      tbFile.write('\
 //\n\
 // Copyright (c) 2015 University of Cambridge\n\
 // All rights reserved.\n\
@@ -1145,7 +1145,7 @@ def write_h(hFile,regsDict):
    
    for entry in regsDict:
       hFile.write('#define SUME_'+block_name+'_'+entry['name'].upper()+'_0_OFFSET 0x'+entry['addr'][4:]+'\n');
-      hFile.write('#define SUME_'+block_name+'_'+entry['name'].upper()+'_0_DEFAULT 0x'+entry['default'][4:]+'\n');
+      hFile.write('#define SUME_'+block_name+'_'+entry['name'].upper()+'_0_DEFAULT 0x'+entry['default'].split("'h")[-1]+'\n');
       hFile.write('#define SUME_'+block_name+'_'+entry['name'].upper()+'_0_WIDTH '+entry['width']+'\n');
 
 #end of write_h
@@ -1157,7 +1157,7 @@ def write_tcl(tclFile,regsDict):
 
    for entry in regsDict:
      tclFile.write('set '+block_name+'_REGS_'+entry['name'].upper()+'_0_OFFSET 0x'+entry['addr'][4:]+'\n');
-     tclFile.write('set '+block_name+'_REGS_'+entry['name'].upper()+'_0_DEFAULT 0x'+entry['default'][4:]+'\n');
+     tclFile.write('set '+block_name+'_REGS_'+entry['name'].upper()+'_0_DEFAULT 0x'+entry['default'].split("'h")[-1]+'\n');
      tclFile.write('set '+block_name+'_REGS_'+entry['name'].upper()+'_0_WIDTH '+entry['width']+'\n');
 
 #end of write_tcl
@@ -1169,7 +1169,7 @@ def write_tcl(tclFile,regsDict):
 def write_tb(tbFile,regsDict):
    for entry in regsDict:
       tbFile.write('#define SUME '+block_name+' '+entry['name'].upper()+' OFFSET 0x'+entry['addr'][4:]+'\n');
-      tbFile.write('#define SUME '+block_name+' '+entry['name'].upper()+' DEFAULT 0x'+entry['default'][4:]+'\n');
+      tbFile.write('#define SUME '+block_name+' '+entry['name'].upper()+' DEFAULT 0x'+entry['default'].split("'h")[-1]+'\n');
       tbFile.write('#define SUME '+block_name+' '+entry['name'].upper()+' WIDTH '+entry['width']+'\n');
 
 #end of write_tb

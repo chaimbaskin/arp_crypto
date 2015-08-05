@@ -75,6 +75,7 @@ def start():
         captureThreads[iface].start()
         openSockets[iface].start()
     alive = False
+    time.sleep(3.0)
     # block until all capture threads are ready
     while not alive:
         alive = True
@@ -127,15 +128,17 @@ def expect(ifaceName, pkt, mask = None):
 ############################
 def barrier(timeout = 10):
     waitPerIteration = float(timeout)/(len(ifaceArray)*5.0)
-    stop = time.clock() + timeout
+    stop = time.time() + timeout
     good = False
-    while not good or stop > time.clock():
-        good = True
+    iters = 0
+    while not good and stop > time.time():
+	good = True
         for iface in ifaceArray:
             captureThreads[iface].compareEvent.set()
         for iface in ifaceArray:
             captureThreads[iface].barrierEvent.wait(waitPerIteration)
             good &= captureThreads[iface].barrierEvent.is_set()
+	    iters += 1
 
     #start = time.clock()
     #good = False

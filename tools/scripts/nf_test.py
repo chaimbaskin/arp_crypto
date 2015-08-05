@@ -282,6 +282,10 @@ def run_sim_test():
 	            charis = os.system("make simtxrx TESTNAME=sim_txrx_dma -C %s" % (designDIr + '/test/'))
 	elif args.gui:
 	    charis = os.system("make simgui TESTNAME=%s -C %s" % (td, designDIr + '/test/'))
+        elif args.bd:
+            charis = os.system("make simbd TESTNAME=%s -C %s" % (td, designDIr + '/test/'))
+    	elif args.guibd:
+            charis = os.system("make simguibd TESTNAME=%s -C %s" % (td, designDIr + '/test/'))
    	else:
     	    charis = os.system("make sim TESTNAME=%s -C %s" % (td, designDIr + '/test/'))
    	print charis
@@ -311,6 +315,10 @@ def run_sim_test():
             cmd.append('--dump')
         if args.gui:
             cmd.append('--gui')
+        if args.bd:
+            cmd.append('--bd')
+        if args.guibd:
+            cmd.append('--guibd')
         if args.ci:
             cmd.append('--ci')
             cmd.append(args.ci)
@@ -346,6 +354,8 @@ def handleArgs():
     parser.add_argument('--vsim', action='store_true', help='Simulation only. If this option is present, vcs will run. Otherwise vsim will run.')
     parser.add_argument('--isim', action='store_true', help='Simulation only. If this option is present, ISIM will run. Otherwise vsim will run.')
     parser.add_argument('--gui', action='store_true', help='Simulation only. This will run the simulator in interactive mode (usually with a GUI).')
+    parser.add_argument('--bd', action='store_true', help='Simulation only. This will run the bd simulator without GUI.')
+    parser.add_argument('--guibd', action='store_true', help='Simulation only. This will run the bd simulation in interactive mode (usually with a GUI).')
     parser.add_argument('--tx', action='store_true', help='Simulation only. This will run the simulator sending from dma to phy.')
     parser.add_argument('--rx', action='store_true', help='Simulation only. This will run the simulator sending from phy to dma.')
     parser.add_argument('--txrx', action='store_true', help='Simulation only. This will run the simulator for loopback.')

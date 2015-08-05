@@ -139,9 +139,15 @@ load_elf_bd:
 		echo "Please run \"make project\" to create and build the project first";\
 	fi;\
 
-sim:	simclean
+sim: simclean
 	cp -f $(NF_DESIGN_DIR)/test/reg_defines_reference_nic.py $(NF_DESIGN_DIR)/test/${TESTNAME}/reg_defines_reference_nic.py
 	vivado -mode batch -source ../../../projects/${PROJ}/hw/tcl/reference_nic_sim.tcl -tclargs ${TESTNAME}
+	$(SUME_FOLDER)/tools/scripts/nf_sim_reconcile_axi_logs.py
+	$(SUME_FOLDER)/tools/scripts/nf_sim_registers_axi_logs.py
+ 
+simbd: simclean
+	cp -f $(NF_DESIGN_DIR)/test/reg_defines_reference_nic.py $(NF_DESIGN_DIR)/test/${TESTNAME}/reg_defines_reference_nic.py
+	vivado -mode batch -source ../../../projects/${PROJ}/hw/tcl/reference_nic_sim_bd.tcl -tclargs ${TESTNAME}
 	$(SUME_FOLDER)/tools/scripts/nf_sim_reconcile_axi_logs.py
 	$(SUME_FOLDER)/tools/scripts/nf_sim_registers_axi_logs.py
  
