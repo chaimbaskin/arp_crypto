@@ -62,17 +62,16 @@ num_broadcast = 10
 
 
 # Reset the switch table lookup counters (value is reset every time is read)
-if isHW():
-    nftest_regread(SUME_OUTPUT_PORT_LOOKUP_0_LUTHIT())
-    nftest_regread(SUME_OUTPUT_PORT_LOOKUP_0_LUTMISS())
+nftest_regread(SUME_OUTPUT_PORT_LOOKUP_0_LUTHIT())
+nftest_regread(SUME_OUTPUT_PORT_LOOKUP_0_LUTMISS())
 
 
 # define the key we want to use to encrypt the packet
 key = 0x0
 
 # Now write the key in the register (in case an older key is left inside)
-if isHW():
-    nftest_regwrite(SUME_CRYPTO_0_KEY(), key)
+#if isHW():
+nftest_regwrite(SUME_CRYPTO_0_KEY(), key)
 
 pkts = []
 encrypt_pkts=[]

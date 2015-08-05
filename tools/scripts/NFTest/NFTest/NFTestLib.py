@@ -367,7 +367,8 @@ def nftest_finish(reg_list):
 ############################
 def nftest_regread_expect(addr, val):
     if sim:
-        nftest_regread(addr)
+        #nftest_regread(addr)
+        simReg.regreadstim(addr)
         simReg.regRead(addr, val)
         return 0
     else:
@@ -379,7 +380,7 @@ def nftest_regread_expect(addr, val):
 ############################
 def nftest_regread(addr):
     if sim:
-        simReg.regreadstim(addr)
+        #simReg.regreadstim(addr)
         return 0
     return hwRegLib.regread(addr)
 

@@ -102,9 +102,11 @@ class pktExpect(Thread):
     #              notifies background thread to compare packet lists
     ############################
     def addPkt(self,pkt):
+	self.lock.acquire()
         self.pkts.append(pkt)
         self.count += 1
         self.barrierEvent.clear()
+	self.lock.release()
         #if self.compareEvent.is_set():
         #    pass
         #else:
@@ -136,8 +138,10 @@ class pktExpect(Thread):
     # Description: adds packet to list of packets to expect
     ############################
     def expectPkt(self, pkt, mask = None):
+	self.lock.acquire()
         self.exp_pkts.append((pkt, mask))
         self.barrierEvent.clear()
+	self.lock.release()
 
     ############################
     # Function: comparePkts

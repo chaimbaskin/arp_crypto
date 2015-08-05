@@ -126,8 +126,6 @@ parameter C_S_AXI_ADDR_WIDTH    = 32
     reg                                 pktin_reg_clear_d;
     reg                                 pktout_reg_clear_d;
 
-    // assign default little endian
-
     // I/O Connections assignments
     assign S_AXI_AWREADY    = axi_awready;
     assign S_AXI_WREADY     = axi_wready;

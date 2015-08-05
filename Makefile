@@ -83,6 +83,7 @@ sume:
 	make -C $(LIB_HW_DIR)/std/cores/axis_sim_record_v1_0_0/
 	make -C $(LIB_HW_DIR)/std/cores/axis_sim_stim_v1_0_0/	
 	make -C $(LIB_HW_DIR)/std/cores/axi_sim_transactor_v1_0_0/
+	make -C $(LIB_HW_DIR)/std/cores/barrier_gluelogic_v1_0_0/
 #	$(MAKE) -C $(LIB_HW_DIR) $(RUN_ARGS)
 ####	for lib in $(LIB_HW_DIR_INSTANCES) ; do \
 #		for lib_type in $(LIB_HW_DIR)/$$lib ; do \
