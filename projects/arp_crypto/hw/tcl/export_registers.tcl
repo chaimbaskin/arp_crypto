@@ -49,7 +49,7 @@ set DEF_LIST {
 
 }
 
-set target_path $::env(NF_DESIGN_DIR)/sw/embedded/src/
+set target_path $::env(NF_DESIGN_DIR)/sw/embedded/src
 set target_file $target_path/sume_register_defines.h
 
 
@@ -156,7 +156,7 @@ close $h_file
 ######################################################
 
 
-
+puts $target_file
 write_header  $target_file 
 
 foreach lib_item $DEF_LIST { 
