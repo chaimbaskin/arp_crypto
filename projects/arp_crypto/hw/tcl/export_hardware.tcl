@@ -36,7 +36,7 @@ set bd_file [get_files -regexp -nocase {.*sub*.bd}]
 
 open_bd_design $bd_file
 open_run impl_1
-export_hardware $bd_file [get_runs impl_1] -bitstream -dir ../sw/embedded/project
+export_hardware $bd_file [get_runs impl_1] -bitstream -dir ../sw/embedded/$::env(NF_PROJECT_NAME)
 
 exit
 
