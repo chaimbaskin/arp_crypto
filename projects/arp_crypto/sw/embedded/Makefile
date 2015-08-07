@@ -38,7 +38,7 @@
 # Vivado Launch Script
 ################################################################################
 
-
+PROJ = ${NF_PROJECT_NAME}
 WS = SDK_Workspace
 
 .PHONY: distclean clean project compile download
@@ -58,23 +58,23 @@ all:
 	@echo ""
 
 project:
-	if [ -d project/hw ]; then\
-		cd project;\
+if [ -d ${PROJ}/hw ]; then\
+		cd ${PROJ};\
 		xsdk -wait -script ../xml/SDKproj.xml -workspace ${WS};\
 		cp ../src/* SDK_Workspace/${NF_PROJECT_NAME}/src/ -rf;\
 	fi;\
 
 # Compile Command needs to run twice to get sw compiled correctly in DEBUG mode
 compile:
-	if [ -d project/SDK_Workspace ]; then\
+    if [ -d ${PROJ}/SDK_Workspace ]; then\
 			xsdk -wait -eclipseargs -nosplash -application org.eclipse.cdt.managedbuilder.core.headlessbuild -build all -data project/${WS} -vmargs -Dorg.eclipse.cdt.core.console=org.eclipse.cdt.core.systemConsole;\
 			xsdk -wait -eclipseargs -nosplash -application org.eclipse.cdt.managedbuilder.core.headlessbuild -build all -data project/${WS} -vmargs -Dorg.eclipse.cdt.core.console=org.eclipse.cdt.core.systemConsole;\
 	fi;\
 
 
 download:
-	if [ -d project/hw ]; then\
-		cd project;\
+	if [ -d ${PROJ}/hw ]; then\
+		cd ${PROJ};\
 		xmd -tcl ../tcl/download.tcl `find hw -name "*.bit"`;\
 	else\
 		echo "Project not found";\
