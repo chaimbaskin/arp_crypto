@@ -41,7 +41,7 @@ set design [lindex $argv 0]
 open_project project/${design}.xpr
 
 set bd_file [get_files -regexp -nocase {.*sub*.bd}]
-set elf_file ../sw/embedded/project/SDK_Workspace/${design}/Debug/${design}.elf
+set elf_file ../sw/embedded/arp_crypto/SDK_Workspace/${design}/Debug/${design}.elf
 
 open_bd_design $bd_file
 
